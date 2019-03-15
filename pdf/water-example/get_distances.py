@@ -3,10 +3,10 @@ from ase.io import write
 from ase import Atoms
 import sys
 import numpy as np
+import math
 
 #Usage: python get_distances.py [md_car_file] [elements_file]
 
-#TO DO: convert positions from fractional to cartesian
 md_car_file=sys.argv[1]
 el_file=sys.argv[2]
 el=open(el_file)
@@ -24,12 +24,14 @@ for i in range(n_steps):
     ax=float(ax)
     ay=float(ay)
     az=float(az)
+    a_mag=math.sqrt(ax*ax+ay*ay+az*az)
 
     b=lines[3+(n_atoms+7)*i]
     bx,by,bz=b.split()
     bx=float(bx)
     by=float(by)
     bz=float(bz)
+    b_mag=math.sqrt(bx*bx+by*by+bz*bz)
 
 
     c=lines[4+(n_atoms+7)*i]
@@ -37,13 +39,14 @@ for i in range(n_steps):
     cx=float(cx)
     cy=float(cy)
     cz=float(cz) 
+    c_mag=math.sqrt(cx*cx+cy*cy+cz*cz)
 
     coords=[]
     oh=[]
     hh=[]
     for j in range(7,(n_atoms+7)):
         x, y, z=lines[j+(n_atoms+7)*i].split()
-        coords.append([float(x), float(y), float(z)])
+        coords.append([a_mag*float(x), b_mag*float(y), c_mag*float(z)])
     atoms=Atoms(elements,positions=coords,cell=[[ax,ay,az],[bx,by,bz],[cx,cy,cz]])
     distances=np.asarray(atoms.get_all_distances(mic=True))
     for i in range(n_atoms):
@@ -53,6 +56,4 @@ for i in range(n_steps):
             if ( (elements[i] == 'H' and elements[j] == 'H') or (elements[i] == 'H' and elements[j] == 'H') ):
                 hh.append(distances[i][j])
 
-    print(oh)
-    print(hh)
 md_car.close
