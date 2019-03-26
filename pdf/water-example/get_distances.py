@@ -20,6 +20,8 @@ lines=md_car.readlines()
 n_steps=len(lines)/(n_atoms+7)
 hh_file=open('hh_distance.txt','w')
 oh_file=open('oh_distance.txt','w')
+znzn_file=open('znzn_distance.txt','w')
+zncl_file=open('zncl_distance.txt','w')
 
 for n in range(n_steps):
     a=lines[2+(n_atoms+7)*n]
@@ -47,6 +49,8 @@ for n in range(n_steps):
     coords=[]
     oh=[]
     hh=[]
+    zncl=[]
+    znzn=[]
     for j in range(7,(n_atoms+7)):
         x, y, z=lines[j+(n_atoms+7)*n].split()
         coords.append([a_mag*float(x), b_mag*float(y), c_mag*float(z)])
@@ -58,6 +62,11 @@ for n in range(n_steps):
                 oh.append(distances[i][j])
             if ( (elements[i] == 'H' and elements[j] == 'H') or (elements[i] == 'H' and elements[j] == 'H') ):
                 hh.append(distances[i][j])
+            if ( (elements[i] == 'Zn' and elements[j] == 'Cl') or (elements[i] == 'Cl' and elements[j] == 'Zn') ):
+                zncl.append(distances[i][j])
+            if ( (elements[i] == 'Zn' and elements[j] == 'Zn') or (elements[i] == 'Zn' and elements[j] == 'Zn') ):
+                znzn.append(distances[i][j])
+
     #Write to files
     #HH
     hh_file.write((str(n+1)))
@@ -69,5 +78,15 @@ for n in range(n_steps):
     for o in oh:
         oh_file.write('\t'+str(o))
     oh_file.write('\n')
+    #ZnZn
+    znzn_file.write((str(n+1)))
+    for zn in znzn:
+        znzn_file.write('\t'+str(zn))
+    znzn_file.write('\n')
+    #ZnCl
+    zncl_file.write((str(n+1)))
+    for c in zncl:
+        zncl_file.write('\t'+str(c))
+    zncl_file.write('\n')
 
 md_car.close
